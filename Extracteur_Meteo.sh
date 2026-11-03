@@ -2,9 +2,7 @@
 ville="$1"
 
 if [ -z "$ville" ]; then 
-   echo "Erreur : Vous devez spécifier une ville en argument."
-   echo "Usage : $0 nom_de_la_ville"
-   exit 1
+   ville="Toulouse"
 fi
 
 ville_url=$(echo "$ville" | tr " " "+")
