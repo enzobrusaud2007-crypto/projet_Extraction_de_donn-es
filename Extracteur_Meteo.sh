@@ -21,7 +21,7 @@ temp_demain=$(grep "°C" meteo_brut.txt | head -3 | tail -1 | tr -s "|" "|"| cut
 #Etape 3 : Formater : date et heure
 
 jour=$(date "+%Y-%m-%d")
-heure=$(date "+%H:%M)")
+heure=$(date "+%H:%M")
 ligne="$jour - $heure - $ville : ${temp_actuelle}°C - ${temp_demain}°C"
 
 #Etape 4 : Enregistrer sur une seule ligne dans meteo.txt
