@@ -21,10 +21,15 @@ temp_demain=$(grep "°C" meteo_brut.txt | head -3 | tail -1 | tr -s "|" "|"| cut
 jour=$(date "+%Y-%m-%d")
 heure=$(date "+%H:%M)")
 ligne="$jour - $heure - $ville : ${temp_actuelle}°C - ${temp_demain}°C"
+#Etape 4 Archivage dans l'historique quotidien
 
-#Etape 4 : Enregistrer sur une seule ligne dans meteo.txt
+date_fichier=$(date "+%Y%m%d")
+fichier_historique="meteo_${date_fichier}.txt"
 
-echo "$ligne" >> meteo.txt
+
+#Etape 5 : Enregistrer sur une seule ligne dans meteo.txt
+
+echo "$ligne" >> "fichier_historique"
 
 rm -f meteo_brut.txt
 
