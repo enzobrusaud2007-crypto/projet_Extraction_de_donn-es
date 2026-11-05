@@ -13,9 +13,9 @@ https://github.com/enzobrusaud2007-crypto/projet_Extraction_de_donn-es
 | Mohamed Amine Khadraoui | Membre de l'équipe |
 
 - **Teams** : un canal pour l'organisation de l'équipe (partage du code, relectures, répartition) et un canal pour les échanges avec les enseignants.
-- **GitHub** : une branche par version (`feature/v2`, `feature/v3`, `feature/variante3`), des commits réguliers, des tags `v1`, `v2`, `v3`, puis `Variante1`, `Variante2` et `Variante3`.
+- **GitHub** : une branche par version (`feature/v2`, `feature/v3`, `feature/variante3`), des commits réguliers, des tags `v1`, `v2` et `v3` pour les versions de base (convention `Variante1` à `Variante3` pour les variantes).
 - **Jira** : suivi des tâches. L'intégration Jira–Teams demande des droits d'administration, et la demande a été transmise aux enseignants.
-- **Relecture croisée** : chaque version publiée sur Teams est relue par un autre membre. Exemples : la parenthèse en trop dans l'heure, `rm` non autorisé, l'extraction de la prévision.
+- **Relecture croisée** : les versions publiées sur Teams sont relues par un autre membre. Exemples : la parenthèse en trop dans l'heure, `rm` non autorisé, l'extraction de la prévision.
 
 ## Gestion de projet
 
@@ -30,7 +30,7 @@ Démarche **incrémentale** qui suit le découpage du sujet. On traite une versi
 
 ## Solution implémentée : V3 corrigée et variante 3
 
-Utilisation : `./Extracteur_Meteo.sh [-h] [ville]`. Sans ville, le script prend Toulouse. L'option `-h` archive le relevé dans le fichier du jour.
+Utilisation : `./Extracteur_Meteo.sh [-h] [ville]` (après `chmod +x Extracteur_Meteo.sh`) ou `bash Extracteur_Meteo.sh [-h] [ville]`. Sans ville, le script prend Toulouse. L'option `-h` archive le relevé dans le fichier du jour.
 
 - **Prévision du lendemain** : les colonnes de wttr.in sont séparées par `│` et non par `|`, donc `cut -d"|"` ne découpait rien et renvoyait la température du matin. On extrait maintenant les 4 températures de la ligne de demain avec `grep -o -E "[-+]?[0-9]+(\([-+]?[0-9]+\))? °C"`, puis on garde celle de midi avec `head -2 | tail -1`.
 - **V3 (historique)** : avec `-h`, la ligne est ajoutée à `meteo_$(date "+%Y%m%d").txt`, ce qui donne un fichier par jour. Le `$` manquait devant `fichier_historique`, et `rm -f` a été retiré : il n'est pas autorisé, et `>` écrase déjà le fichier brut.
