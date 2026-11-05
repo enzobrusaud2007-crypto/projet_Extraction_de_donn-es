@@ -68,6 +68,20 @@ Tests du 05/11 :
 - `-h "Saint Petersburg"` crée bien le fichier du jour.
 - `Zzqxwvlk` écrit une erreur horodatée dans `meteo_error.log`.
 
+## Solution Variante 1 : Informations supplémentaires (vent et visibilité)
+
+- **Extraction** : on lit les 7 premières lignes de `meteo_brut.txt` (`head -n 7`) pour récupérer les données actuelles sans toucher aux prévisions. Le vent est extrait avec `grep -o -E "[0-9]+ km/h"` et la visibilité avec `grep -o -E "[0-9]+ km([^/]|$)"` (pour éviter de reprendre le vent). Si une donnée manque, on met `N/A`.
+- **Format** : la ligne enregistrée devient `[Date] - [Heure] - Ville : [Temp. actuelle] - [Prévision] - Vent : [Vent] - Visibilité : [Visibilité]`[cite: 1].
+- **Options** : `-h` affiche l'aide et `-a` remplace l'ancien `-h` de la V3 pour archiver dans `meteo_$(date "+%Y%m%d").txt`.
+
+
+## Solution Variante 2 : Sauvegarde au format JSON
+
+- **Option `-j`** : redirige l'écriture vers `meteo.json` au lieu de `meteo.txt`.
+- **Format** : écrit un objet JSON par ligne avec la date, l'heure, la ville, les températures, le vent et la visibilité.
+- **Archivage** : combiné avec `-a`, le script archive directement dans un fichier `.json` du jour (`meteo_$(date "+%Y%m%d").json`).
+
+  
 ## Solution Variante 3 : Ajouter une Gestion des erreurs et des logs
 
 - **V3 (historique)** : avec `-h`, la ligne est ajoutée à `meteo_$(date "+%Y%m%d").txt`, ce qui donne un fichier par jour. Le `$` manquait devant `fichier_historique`, et `rm -f` a été retiré : il n'est pas autorisé, et `>` écrase déjà le fichier brut.
