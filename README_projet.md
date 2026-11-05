@@ -28,7 +28,7 @@ Démarche **incrémentale** qui suit le découpage du sujet. On traite une versi
 - **05/11** : tests, corrections et variante 3.
 - **06/11** : rendu.
 
-Solution implémentée : Version 1 (script de base)
+## Solution implémentée : Version 1 (script de base)
 
 Utilisation : ./Extracteur_Meteo.sh <ville> (après chmod +x Extracteur_Meteo.sh) ou bash Extracteur_Meteo.sh <ville>. Si aucune ville n’est donnée, le script affiche un message d’erreur et un rappel d’usage, puis s’arrête avec exit 1.
 
@@ -45,7 +45,7 @@ Limite connue : sur la ligne de demain, le premier nombre rencontré est celui d
 
 Tag : v1.0.
 
-Solution implémentée : Version 2 (automatisation périodique)
+## Solution implémentée : Version 2 (automatisation périodique)
 
 Par rapport à la V1, le script garde les quatre étapes et ajoute trois éléments :
 
