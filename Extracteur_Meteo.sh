@@ -1,24 +1,23 @@
 #!/bin/bash
-# Extracteur_Météo.sh - VARIANTE 1 : vent et visibilité en plus
-# Usage : ./Extracteur_Météo.sh [-a] [-h] [ville]
+# Extracteur_Meteo.sh - Variante 3 : gestion des erreurs et des logs
+# Usage : ./Extracteur_Meteo.sh [-h] [ville]
+#   -h    archive aussi la ligne dans le fichier du jour meteo_YYYYMMDD.txt
+# En cas de problème avec wttr.in, un message horodaté est écrit dans meteo_error.log
 
-archive=0
-
-while [ "${1#-}" != "$1" ]; do
-   case "$1" in
-      -a) archive=1 ;;
-      -h) echo "Usage : $0 [-a] [-h] [ville]"
-          echo "  -a  archive aussi la ligne dans meteo_YYYYMMDD.txt"
-          echo "  -h  affiche cette aide"
-          exit 0 ;;
-      *) echo "Option inconnue : $1"; echo "Usage : $0 [-a] [-h] [ville]"; exit 1 ;;
-   esac
+historique=0
+if [ "$1" = "-h" ]; then
+   historique=1
    shift
-done
+fi
 
-ville="${1:-Toulouse}"
+ville="$1"
+if [ -z "$ville" ]; then
+   ville="Toulouse"
+fi
+
 ville_url=$(echo "$ville" | tr " " "+")
 
+# Variante 3 : écrit une erreur horodatée dans meteo_error.log, l'affiche et arrête le script
 erreur() {
    echo "[$(date "+%Y-%m-%d %H:%M:%S")] ERREUR ($ville) : $1" >> meteo_error.log
    echo "Erreur : $1 (voir meteo_error.log)"
@@ -26,41 +25,34 @@ erreur() {
 }
 
 # Etape 1 : récupération des données brutes
-if ! curl -s -f -m 15 "wttr.in/$ville_url?T" > meteo_brut.txt; then
+# -f : curl échoue aussi si wttr.in renvoie une erreur HTTP (ex. ville inconnue)
+if ! curl -s -f "wttr.in/$ville_url?T" > meteo_brut.txt; then
    erreur "impossible de récupérer la météo depuis wttr.in (connexion impossible ou ville inconnue)"
 fi
 
+# Réponse vide ou sans température : données inutilisables
 if ! grep -q "°C" meteo_brut.txt; then
    erreur "réponse de wttr.in vide ou sans température"
 fi
 
-# Etape 2 : températures
-lignes_temp=$(grep "°C" meteo_brut.txt)
-motif="[-+]?[0-9]+(-[0-9]+)?(\([-+]?[0-9]+\))? °C"
-
-temp_actuelle=$(echo "$lignes_temp" | head -n 1 | grep -o -E "$motif" | head -n 1 | grep -o -E "^[-+]?[0-9]+" | tr -d "+")
-temp_demain=$(echo "$lignes_temp" | head -n 3 | tail -n 1 | grep -o -E "$motif" | head -n 2 | tail -n 1 | grep -o -E "^[-+]?[0-9]+" | tr -d "+")
+# Etape 2 : extraire les températures
+temp_actuelle=$(grep "°C" meteo_brut.txt | head -1 | grep -o -E "[-+]?[0-9°]+" | head -1 | tr -d "+")
+temp_demain=$(grep "°C" meteo_brut.txt | head -3 | tail -1 | grep -o -E "[-+]?[0-9]+(\([-+]?[0-9]+\))? °C" | head -2 | tail -1 | cut -d"(" -f1 | cut -d" " -f1 | tr -d "+")
 
 if [ -z "$temp_actuelle" ] || [ -z "$temp_demain" ]; then
    erreur "températures introuvables dans la réponse de wttr.in"
 fi
 
-# Etape 2 bis : vent et visibilité (bloc "conditions actuelles" = 7 premières lignes)
-vent=$(head -n 7 meteo_brut.txt | grep -o -E "[0-9]+ km/h" | head -n 1 | grep -o -E "[0-9]+")
-visibilite=$(head -n 7 meteo_brut.txt | grep -o -E "[0-9]+ km([^/]|$)" | head -n 1 | grep -o -E "[0-9]+")
-
-if [ -z "$vent" ]; then vent="N/A"; else vent="${vent} km/h"; fi
-if [ -z "$visibilite" ]; then visibilite="N/A"; else visibilite="${visibilite} km"; fi
-
 # Etape 3 : formater
 jour=$(date "+%Y-%m-%d")
 heure=$(date "+%H:%M")
-ligne="$jour - $heure - $ville : ${temp_actuelle}°C - ${temp_demain}°C - Vent : $vent - Visibilité : $visibilite"
+ligne="$jour - $heure - $ville : ${temp_actuelle}°C - ${temp_demain}°C"
 
 # Etape 4 : enregistrer
 echo "$ligne" >> meteo.txt
 
-if [ "$archive" = 1 ]; then
+# V3 : historique, un fichier par jour
+if [ "$historique" = "1" ]; then
    fichier_historique="meteo_$(date "+%Y%m%d").txt"
    echo "$ligne" >> "$fichier_historique"
    echo "Archivé dans $fichier_historique"
@@ -68,6 +60,7 @@ fi
 
 echo "Extraction réussie :"
 echo "$ligne"
+
 
 
 
