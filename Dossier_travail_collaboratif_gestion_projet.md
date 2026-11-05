@@ -66,3 +66,57 @@ Nous avons suivi une démarche **incrémentale**, en suivant le découpage du su
 | Blocage du campus : certains membres ne peuvent pas venir à la fac | Coordination entièrement à distance via Teams, code partagé dans les publications et sur GitHub |
 | Commandes limitées (`grep`, `head`, `tail`, `tr`, `cut`, `rev`, `xargs`, `echo`) | Suppression de `rm -f`, inutile puisque `>` écrase le fichier brut à chaque exécution ; usage de `date` à confirmer auprès des enseignants |
 | Format du tableau wttr.in (séparateur `│`) | Extraction par motif `grep -o -E` sur les températures au lieu d'un découpage par colonnes |
+
+## Solution implémentée : V3 corrigée et variante 3 (Ilias Bariol-Alaoui)
+
+Code sur la branche `feature/variante3`, fichier `Extracteur_Meteo.sh`.
+
+### Utilisation
+
+```bash
+./Extracteur_Meteo.sh                 # Toulouse par défaut (V2)
+./Extracteur_Meteo.sh Paris           # ville passée en argument
+./Extracteur_Meteo.sh -h Paris        # V3 : archive aussi le relevé dans meteo_AAAAMMJJ.txt
+```
+
+### Extraction des températures (correctif des versions de base)
+
+La sortie texte de wttr.in contient d'abord un bloc « conditions actuelles », puis trois tableaux : aujourd'hui, demain et après-demain. Chaque tableau a une ligne de températures découpée en 4 colonnes (matin, midi, soir, nuit), séparées par le caractère `│`.
+
+- **Température actuelle** : `grep "°C" | head -1` isole la première ligne contenant `°C`, celle des conditions actuelles. `grep -o -E "[-+]?[0-9°]+" | head -1` garde le premier nombre signé, et `tr -d "+"` retire le signe `+`.
+- **Prévision du lendemain** : `grep "°C" | head -3 | tail -1` isole la 3e ligne contenant `°C`, celle de demain. Ensuite :
+  1. `grep -o -E "[-+]?[0-9]+(\([-+]?[0-9]+\))? °C"` extrait les 4 températures de la ligne, par exemple `+8(9) °C`, `+14(15) °C`, `+12(11) °C` et `10 °C` ;
+  2. `head -2 | tail -1` garde la 2e, celle de midi : `+14(15) °C` ;
+  3. `cut -d"(" -f1 | cut -d" " -f1 | tr -d "+"` retire la température ressentie, l'unité et le signe : `14`.
+
+Cette méthode ne dépend pas du séparateur `│`, que `cut` ne sait pas utiliser car c'est un caractère sur plusieurs octets. Elle fonctionne aussi avec les températures négatives (`-18(-23) °C` donne `-18`).
+
+### V3 : gestion de l'historique
+
+- L'option `-h` est lue en premier argument. `shift` la retire pour que la ville reste dans `$1`.
+- Le nom du fichier du jour est construit avec `meteo_$(date "+%Y%m%d").txt`. Chaque exécution ajoute sa ligne au fichier avec `>>` : on obtient un fichier par jour.
+- `meteo.txt` continue de recevoir chaque relevé, comme en V1 et V2.
+- Correctifs apportés à la V3 initiale :
+  - le `$` manquait devant `fichier_historique`, donc la ligne partait dans un fichier nommé « fichier_historique » ;
+  - une parenthèse en trop apparaissait dans l'heure ;
+  - `rm -f` a été retiré, car il n'est pas autorisé et inutile : `>` écrase déjà `meteo_brut.txt`.
+
+### Variante 3 : gestion des erreurs et des logs
+
+- La fonction `erreur` ajoute une ligne `[AAAA-MM-JJ HH:MM:SS] ERREUR (ville) : message` à `meteo_error.log`, affiche l'erreur et arrête le script (`exit 1`). Elle ne pollue donc pas `meteo.txt` avec une ligne vide.
+- Trois cas sont détectés :
+  1. **wttr.in injoignable ou ville inconnue** : avec `curl -s -f`, curl échoue sur une erreur HTTP (wttr.in renvoie une erreur 500 pour une ville inconnue) comme sur une absence de connexion ;
+  2. **réponse vide ou sans température** : `grep -q "°C"` ne trouve rien ;
+  3. **températures introuvables** : l'une des deux variables est vide après l'extraction.
+
+### Tests réalisés (05/11)
+
+| Cas testé | Commande | Résultat obtenu |
+|---|---|---|
+| Ville par défaut | `./Extracteur_Meteo.sh` | `2026-11-05 - 09:43 - Toulouse : 7°C - 14°C` |
+| Températures négatives | `./Extracteur_Meteo.sh Yakutsk` | `2026-11-05 - 09:43 - Yakutsk : -15°C - -18°C` |
+| Ville avec espace + historique | `./Extracteur_Meteo.sh -h "Saint Petersburg"` | ligne ajoutée à `meteo.txt` et à `meteo_20261105.txt` |
+| Ville inconnue | `./Extracteur_Meteo.sh Zzqxwvlk` | `[2026-11-05 09:43:11] ERREUR (Zzqxwvlk) : impossible de récupérer la météo depuis wttr.in (connexion impossible ou ville inconnue)` dans `meteo_error.log`, code de sortie 1 |
+| Serveur injoignable | hôte volontairement invalide | même message horodaté dans `meteo_error.log`, code de sortie 1 |
+
+Commandes de traitement utilisées : `grep`, `head`, `tail`, `tr`, `cut` et `echo`, plus `curl` pour la récupération et `date` pour l'horodatage (usage de `date` à confirmer avec les enseignants).
