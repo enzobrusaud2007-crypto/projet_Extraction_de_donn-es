@@ -28,6 +28,31 @@ Démarche **incrémentale** qui suit le découpage du sujet. On traite une versi
 - **05/11** : tests, corrections et variante 3.
 - **06/11** : rendu.
 
+Automatisation avec cron
+Ouvrir la table des tâches : crontab -e
+Ajouter la ligne suivante (exécution toutes les heures) en remplaçant le chemin :
+0 * * * * cd /chemin/vers/le/depot && bash Extracteur_Meteo.sh
+
+Les 5 champs sont : minute, heure, jour du mois, mois, jour de la semaine. Une étoile '' signifie 'à chaque'. Par exemple, '/30 * * * *' = toutes les 30 minutes. Le 'cd' est nécessaire parce que cron n'éxecute pas le script dans le dossier du projet.
+
+Enregistrer et quitter l'éditeur
+Vérifier avec 'crontab -l', puis consulter 'meteo.txt' quelques minutes plus tard.
+Pour arrêter la tâche : taper 'crontab -e' et supprimer la ligne.
+Sous Windows (WSL), cron ne démarre pas automatiquement, il faut taper 'sudo service cron strat'.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ## Solution implémentée : V3 corrigée et variante 3
 
 Utilisation : `./Extracteur_Meteo.sh [-h] [ville]` (après `chmod +x Extracteur_Meteo.sh`) ou `bash Extracteur_Meteo.sh [-h] [ville]`. Sans ville, le script prend Toulouse. L'option `-h` archive le relevé dans le fichier du jour.
