@@ -7,8 +7,8 @@
 | Enzo Brusaud | Chef de projet : création de l'équipe Teams, du dépôt GitHub et du projet Jira ; V1, V2, V3 ; rédaction du README |
 | Wael Saffiedine | Variantes ; relecture du code des versions de base |
 | Ilias Bariol-Alaoui | Tests des scripts sur la sortie réelle de wttr.in ; V3 corrigée (option d'historique, correctifs) et variante 3 (gestion des erreurs et des logs) sur la branche `feature/variante3` ; rédaction de la partie travail collaboratif / gestion de projet |
-| Matteo Lubat | *(à compléter)* |
-| Mohamed Amine Khadraoui | *(à compléter)* |
+| Matteo Lubat | Pas de contribution visible sur Teams ni sur GitHub au 05/11 |
+| Mohamed Amine Khadraoui | Pas de contribution visible sur Teams ni sur GitHub au 05/11 |
 
 Enseignants ajoutés à l'équipe Teams : M. Bilal Chebaro et M. Cédric Teyssié.
 
