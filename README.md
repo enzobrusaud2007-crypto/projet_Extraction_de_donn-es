@@ -71,7 +71,7 @@ Tests du 05/11 :
 ## Solution Variante 1 : Informations supplémentaires (vent et visibilité)
 
 - **Extraction** : on lit les 7 premières lignes de `meteo_brut.txt` (`head -n 7`) pour récupérer les données actuelles sans toucher aux prévisions. Le vent est extrait avec `grep -o -E "[0-9]+ km/h"` et la visibilité avec `grep -o -E "[0-9]+ km([^/]|$)"` (pour éviter de reprendre le vent). Si une donnée manque, on met `N/A`.
-- **Format** : la ligne enregistrée devient `[Date] - [Heure] - Ville : [Temp. actuelle] - [Prévision] - Vent : [Vent] - Visibilité : [Visibilité]`[cite: 1].
+- **Format** : la ligne enregistrée devient `[Date] - [Heure] - Ville : [Temp. actuelle] - [Prévision] - Vent : [Vent] - Visibilité : [Visibilité]`.
 - **Options** : `-h` affiche l'aide et `-a` remplace l'ancien `-h` de la V3 pour archiver dans `meteo_$(date "+%Y%m%d").txt`.
 
 
