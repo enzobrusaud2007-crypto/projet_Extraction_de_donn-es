@@ -15,8 +15,7 @@ curl -s "wttr.in/$ville_url?T" > meteo_brut.txt
 # Etape 2 : extraire les temperatures 
 
 temp_actuelle=$(grep "°C" meteo_brut.txt | head -1 | grep -o -E "[-+]?[0-9°]+" | head -1 | tr -d "+")
-temp_demain=$(grep "°C" meteo_brut.txt | head -3 | tail -1 | tr -s "|" "|"| cut -d"|" -f3 | grep -o -E "[-+]?[0-9]+" | head -1 | tr -d "+")
-
+temp_demain=$(grep "°C" meteo_brut.txt | head -3 | tail -1 | grep -o -E "[-+]?[0-9]+(\([-+]?[0-9]+\))? °C" | head -2 | tail -1 | cut -d"(" -f1 | cut -d" " -f1 | tr -d "+")
 
 #Etape 3 : Formater : date et heure
 
@@ -27,8 +26,6 @@ ligne="$jour - $heure - $ville : ${temp_actuelle}°C - ${temp_demain}°C"
 #Etape 4 : Enregistrer sur une seule ligne dans meteo.txt
 
 echo "$ligne" >> meteo.txt
-
-rm -f meteo_brut.txt
 
 echo "Extraction réussie :"
 echo "$ligne"
