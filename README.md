@@ -6,7 +6,7 @@ https://github.com/enzobrusaud2007-crypto/projet_Extraction_de_donn-es
 
 | Membre | Rôle |
 |---|---|
-| Enzo Brusaud | Chef de projet (Teams, GitHub, Jira) ; V1, V2, V3 ; README |
+| Enzo Brusaud | Chef de projet (Teams, GitHub, Jira) ; V1, V2, V3 ; README ; Rédaction de la version 1 et 2 du projet ; Correcteur du code |
 | Wael Saffiedine | Variantes ; relecture du code |
 | Ilias Bariol-Alaoui | Tests sur la sortie réelle de wttr.in ; V3 corrigée et variante 3 ; dossier (travail collaboratif, gestion de projet) |
 | Matteo Lubat | Membre de l'équipe |
