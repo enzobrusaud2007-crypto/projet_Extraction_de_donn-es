@@ -55,12 +55,11 @@ README : il explique l’objectif du projet, l’exécution du script (avec la v
 
 Tag : v2.0.
 
-## Solution implémentée : V3 corrigée et variante 3
+## Solution implémentée : Version 3 (gestion d'historique) et Variante 3
 
 Utilisation : `./Extracteur_Meteo.sh [-h] [ville]` (après `chmod +x Extracteur_Meteo.sh`) ou `bash Extracteur_Meteo.sh [-h] [ville]`. Sans ville, le script prend Toulouse. L'option `-h` archive le relevé dans le fichier du jour.
 
 - **Prévision du lendemain** : les colonnes de wttr.in sont séparées par `│` et non par `|`, donc `cut -d"|"` ne découpait rien et renvoyait la température du matin. On extrait maintenant les 4 températures de la ligne de demain avec `grep -o -E "[-+]?[0-9]+(\([-+]?[0-9]+\))? °C"`, puis on garde celle de midi avec `head -2 | tail -1`.
-- **V3 (historique)** : avec `-h`, la ligne est ajoutée à `meteo_$(date "+%Y%m%d").txt`, ce qui donne un fichier par jour. Le `$` manquait devant `fichier_historique`, et `rm -f` a été retiré : il n'est pas autorisé, et `>` écrase déjà le fichier brut.
 - **Variante 3 (erreurs et logs)** : si wttr.in est injoignable, si la ville est inconnue (`curl -f`) ou si la réponse n'a pas de température, un message horodaté `[AAAA-MM-JJ HH:MM:SS] ERREUR` est ajouté à `meteo_error.log`, et le script s'arrête avec le code 1.
 
 Tests du 05/11 :
@@ -68,3 +67,7 @@ Tests du 05/11 :
 - `Yakutsk` donne `-15°C - -18°C` (températures négatives).
 - `-h "Saint Petersburg"` crée bien le fichier du jour.
 - `Zzqxwvlk` écrit une erreur horodatée dans `meteo_error.log`.
+
+## Solution Variante 3 : Ajouter une Gestion des erreurs et des logs
+
+- **V3 (historique)** : avec `-h`, la ligne est ajoutée à `meteo_$(date "+%Y%m%d").txt`, ce qui donne un fichier par jour. Le `$` manquait devant `fichier_historique`, et `rm -f` a été retiré : il n'est pas autorisé, et `>` écrase déjà le fichier brut.
