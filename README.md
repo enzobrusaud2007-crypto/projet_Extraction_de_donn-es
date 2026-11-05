@@ -55,7 +55,7 @@ README : il explique l’objectif du projet, l’exécution du script (avec la v
 
 Tag : v2.0.
 
-## Solution implémentée : Version 3 (gestion d'historique) et Variante 3
+## Solution implémentée : Version 3 (gestion d'historique) 
 
 Utilisation : `./Extracteur_Meteo.sh [-h] [ville]` (après `chmod +x Extracteur_Meteo.sh`) ou `bash Extracteur_Meteo.sh [-h] [ville]`. Sans ville, le script prend Toulouse. L'option `-h` archive le relevé dans le fichier du jour.
 
