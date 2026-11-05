@@ -28,30 +28,32 @@ Démarche **incrémentale** qui suit le découpage du sujet. On traite une versi
 - **05/11** : tests, corrections et variante 3.
 - **06/11** : rendu.
 
-Automatisation avec cron
-Ouvrir la table des tâches : crontab -e
-Ajouter la ligne suivante (exécution toutes les heures) en remplaçant le chemin :
-0 * * * * cd /chemin/vers/le/depot && bash Extracteur_Meteo.sh
+Solution implémentée : Version 1 (script de base)
 
-Les 5 champs sont : minute, heure, jour du mois, mois, jour de la semaine. Une étoile '' signifie 'à chaque'. Par exemple, '/30 * * * *' = toutes les 30 minutes. Le 'cd' est nécessaire parce que cron n'éxecute pas le script dans le dossier du projet.
+Utilisation : ./Extracteur_Meteo.sh <ville> (après chmod +x Extracteur_Meteo.sh) ou bash Extracteur_Meteo.sh <ville>. Si aucune ville n’est donnée, le script affiche un message d’erreur et un rappel d’usage, puis s’arrête avec exit 1.
 
-Enregistrer et quitter l'éditeur
-Vérifier avec 'crontab -l', puis consulter 'meteo.txt' quelques minutes plus tard.
-Pour arrêter la tâche : taper 'crontab -e' et supprimer la ligne.
-Sous Windows (WSL), cron ne démarre pas automatiquement, il faut taper 'sudo service cron strat'.
+Le script suit les quatre étapes du sujet :
 
+Étape 1, récupération : les espaces du nom de ville sont remplacés par des + avec tr " " "+" (pour « Saint Etienne » par exemple). curl -s "wttr.in/$ville_url?T" récupère la réponse au format texte de wttr.in (?T supprime les couleurs), qui est sauvegardée dans le fichier local meteo_brut.txt.
+Étape 2, extraction : la réponse contient une ligne de températures pour le moment présent, puis une ligne par jour de prévision. La température actuelle est le premier nombre de la première ligne qui contient °C : grep "°C" sélectionne les lignes, head -1 garde la première, grep -o -E "[-+]?[0-9]+" isole les nombres (avec leur signe), un second head -1 garde le premier, et tr -d "+" enlève le signe +. La prévision du lendemain est lue sur la troisième ligne contenant °C (head -3 | tail -1), c’est-à-dire la ligne du jour suivant, avec la même extraction.
+Étape 3, formatage : la date et l’heure sont obtenues avec date "+%Y-%m-%d" et date "+%H:%M", puis assemblées dans une variable : [Date] - [Heure] - Ville : [Température actuelle] - [Prévision du lendemain].
+Étape 4, enregistrement : la ligne est ajoutée à la fin de meteo.txt avec echo "$ligne" >> meteo.txt : une seule ligne par exécution, et les anciens relevés sont conservés.
 
+Exemple de ligne obtenue : [2026-11-03 - 12:41 - Toulouse : 17°C - 19°C].
 
+Limite connue : sur la ligne de demain, le premier nombre rencontré est celui de la colonne du matin, et non celui de midi. Ce point a été corrigé dans la version 3 (voir plus haut).
 
+Tag : v1.0.
 
+Solution implémentée : Version 2 (automatisation périodique)
 
+Par rapport à la V1, le script garde les quatre étapes et ajoute trois éléments :
 
+Ville par défaut : le test if [ -z "$ville" ] ne s’arrête plus avec une erreur, il affecte ville="Toulouse". ./Extracteur_Meteo.sh fonctionne donc sans argument, et ./Extracteur_Meteo.sh Paris utilise toujours la ville donnée.
+Tâche cron : Windows n’ayant pas cron, la tâche a été configurée sous WSL (Ubuntu) avec crontab -e. La ligne 0 * * * * cd /chemin/vers/le/depot && bash Extracteur_Meteo.sh lance le script toutes les heures et ajoute un relevé à meteo.txt. Le cd est nécessaire, car cron n’exécute pas le script depuis le dossier du projet. Le service doit être démarré avec sudo service cron start. Pour le test, la tâche a d’abord été lancée chaque minute (* * * * *), puis passée à une exécution par heure. Vérification : crontab -l et lecture de meteo.txt [captures d’écran à joindre].
+README : il explique l’objectif du projet, l’exécution du script (avec la ville par défaut) et la configuration pas à pas d’une tâche cron (voir la section « Automatisation avec cron » ci-dessus).
 
-
-
-
-
-
+Tag : v2.0.
 
 ## Solution implémentée : V3 corrigée et variante 3
 
